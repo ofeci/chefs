@@ -15,6 +15,7 @@ class MyAgent(IAgent.IAgent):
         itemindex = numpy.array(numpy.where(numpy.array(possibleActions) == 1))[0].tolist()
 
         itemindex = itemindex[:-1] if len(itemindex) > 1 else itemindex
+
         random.shuffle(itemindex)
         aIndex = itemindex[0]
         a = numpy.zeros(200)
