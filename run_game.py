@@ -3,7 +3,7 @@ from ChefsHatGym.Agents import Agent_Naive_Random
 from ChefsHatGym.Rewards import RewardOnlyWinning
 
 from ChefsHatGym.env import ChefsHatEnv
-
+from my_agent import MyAgent
 import gym
 
 """Game parameters"""
@@ -12,7 +12,9 @@ gameStopCriteria = 10
 rewardFunction = RewardOnlyWinning.RewardOnlyWinning()
 
 """Player Parameters"""
-agent1 = Agent_Naive_Random.AgentNaive_Random("Random1")
+# agent1 = Agent_Naive_Random.AgentNaive_Random("Random1")
+agent1 = MyAgent("MyAgent1")
+# agent2 = MyAgent("MyAgent2")
 agent2 = Agent_Naive_Random.AgentNaive_Random("Random2")
 agent3 = Agent_Naive_Random.AgentNaive_Random("Random3")
 agent4 = Agent_Naive_Random.AgentNaive_Random("Random4")
