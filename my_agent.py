@@ -22,7 +22,7 @@ class MyAgent(IAgent.IAgent):
         a[aIndex] = 1
         return a
 
-    def actionUpdate(self,  observation, nextObservation, action, envInfo):
+    def actionUpdate(self, observations, nextobs, action, reward, info):
         pass
 
     def observeOthers(self, envInfo):

@@ -4,9 +4,11 @@ from ChefsHatGym.Rewards import RewardPerformanceScore, RewardOnlyWinning
 import random
 import numpy as np
 
+
 class QTable:
     def __init__(self):
         self.q_table = {}
+
 
 class QAgent:
 
@@ -17,7 +19,7 @@ class QAgent:
 
         self.q_table = {} if table is None else table.q_table
         self.gamma = 0.9
-        self.lr = 0.01
+        self.lr = 0.1
         self.eps = 1
 
     def get_best_action(self, observations):
