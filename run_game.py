@@ -22,11 +22,12 @@ gameStopCriteria = 10
 # agent1 = DQNAgent("MyAgent1")
 # memory = ReplayMemory(100000)
 agent1 = DQNAgent("1")
+agent1 = DQNAgent.load("models/agent1")
 # agent1 = PathAgent("Path1")
-# agent2 = MemoryAgent("Random2")
-agent2 = DQNAgent("2")
-agent3 = DQNAgent("3")
-agent4 = DQNAgent("4")
+# agent2 = AgentNaive_Random("Random2")
+agent2 = MyAgent("2")
+agent3 = MyAgent("3")
+agent4 = MyAgent("4")
 
 
 agentNames = [agent1.name, agent2.name, agent3.name, agent4.name]
@@ -76,4 +77,4 @@ for a in range(episodes):
                 print("Wins:" + str(wins))
             print("-------------")
 
-agent1.save("models/agent1")
+# agent1.save("models/agent1")
