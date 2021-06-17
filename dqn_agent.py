@@ -20,6 +20,8 @@ TAU = 1e-3  # for soft update of target parameters
 LR = 1e-3  # learning rate
 UPDATE_EVERY = 4  # how often to update the network
 
+BANNED = [199, 198]
+
 
 class ReplayMemory(object):
 
@@ -92,7 +94,7 @@ class DQNAgent:
         state = torch.from_numpy(observations[28:].astype(np.float32))
         possible_actions = observations[28:]
         itemindex = np.array(np.where(np.array(possible_actions) == 1))[0].tolist()
-        itemindex = itemindex[:-1] if len(itemindex) > 1 else itemindex
+        itemindex = [i for i in itemindex if i not in BANNED] or itemindex
 
         random.shuffle(itemindex)
 
@@ -100,7 +102,7 @@ class DQNAgent:
             actions = self.policy(state)
 
         actions = [actions[index] for index in itemindex]
-        best_action = np.argmax(actions)
+        best_action = int(np.argmax(actions))
         best_action = itemindex[best_action]
 
         best_action = best_action if random.random() > self.eps else itemindex[0]
@@ -174,7 +176,7 @@ class DQNAgent:
         action = torch.tensor([np.argmax(action)])
         reward = torch.tensor([reward])
 
-        if self.last_state is not None and int(action[0]) != 199:
+        if self.last_state is not None and int(action[0]) not in BANNED:
             self.memory.push(self.last_state, self.last_action, state, self.last_reward)
         self.last_state = state
         self.last_action = action
