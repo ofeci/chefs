@@ -107,7 +107,7 @@ class DQNAgent:
             return agent
 
     def update_epsilon(self):
-        self.eps = 0.999 * self.eps
+        self.eps = 0.998 * self.eps
         if self.eps < 0.1:
             self.eps = 0.1
 
