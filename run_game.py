@@ -23,9 +23,10 @@ gameStopCriteria = 10
 # agent1 = DQNAgent("MyAgent1")
 # memory = ReplayMemory(100000)
 agent1 = DQNAgent("1")
-agent1 = DQNAgent.load("models/agent1")
+# agent1 = DQNAgent.load("models/agent1")
 # agent1 = PathAgent("Path1")
 # agent2 = AgentNaive_Random("Random2")
+# agent1 = MyAgent("1")
 agent2 = MyAgent("2")
 agent3 = MyAgent("3")
 agent4 = MyAgent("4")
@@ -69,13 +70,13 @@ for a in itertools.count(start=1):
             currentPlayer.actionUpdate(observations, nextobs, action, reward, info)
 
         if isMatchOver:
-            print("-------------")
-            print("Match:" + str(info["matches"]))
-            print("Score:" + str(info["score"]))
-            print("Performance:" + str(info["performanceScore"]))
+            # print("-------------")
+            # print("Match:" + str(info["matches"]))
+            # print("Score:" + str(info["score"]))
+            # print("Performance:" + str(info["performanceScore"]))
             if env.gameFinished:
                 wins[np.argmax(np.array(info["score"]))] += 1
                 print("Wins:" + str(wins))
-            print("-------------")
+            # print("-------------")
 
 # agent1.save("models/agent1")
