@@ -11,11 +11,12 @@ import torch.optim as optim
 # DEVICE = torch.cuda.set_device(1)
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-BUFFER_SIZE = int(2e3)  # replay buffer size
-BATCH_SIZE = 16  # minibatch size
+BUFFER_SIZE = int(1e3)  # replay buffer size
+BATCH_SIZE = 8  # minibatch size
 GAMMA = 0.99  # discount factor
 TAU = 1e-3  # for soft update of target parameters
 LR = 5e-3  # learning rate
+UPDATE_EVERY = 3  # how often to update the network
 
 BANNED = [199, 198]
 
@@ -219,5 +220,9 @@ class DQNAgent:
 
         if matchFinished:
             self.update_epsilon()
+        self.step_count += 1
+        if self.step_count % UPDATE_EVERY == 0 or matchFinished:
+            self.optimize_model()
+            self.step_count = 0
 
         return self.reward.getReward(thisPlayerPosition, performanceScore, matchFinished)
