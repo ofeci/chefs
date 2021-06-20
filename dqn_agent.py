@@ -16,7 +16,6 @@ BATCH_SIZE = 16  # minibatch size
 GAMMA = 0.99  # discount factor
 TAU = 1e-3  # for soft update of target parameters
 LR = 5e-3  # learning rate
-UPDATE_EVERY = 4  # how often to update the network
 
 BANNED = [199, 198]
 
@@ -205,11 +204,6 @@ class DQNAgent:
         self.last_state = state
         self.last_action = action
         self.last_reward = reward
-
-        self.step_count += 1
-        if self.step_count % UPDATE_EVERY == 0:
-            self.optimize_model()
-            self.step_count = 0
 
     def observeOthers(self, envInfo):
         pass
