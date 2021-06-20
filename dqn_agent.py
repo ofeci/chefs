@@ -8,19 +8,19 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-from my_reward import MyReward
-
-Transition = namedtuple('Transition',
-                        ('state', 'action', 'next_state', 'reward'))
+# DEVICE = torch.cuda.set_device(1)
+DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 BUFFER_SIZE = int(2e3)  # replay buffer size
 BATCH_SIZE = 16  # minibatch size
 GAMMA = 0.99  # discount factor
 TAU = 1e-3  # for soft update of target parameters
-LR = 1e-3  # learning rate
+LR = 5e-3  # learning rate
 UPDATE_EVERY = 4  # how often to update the network
 
 BANNED = [199, 198]
+
+Transition = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'))
 
 
 class ReplayMemory(object):
@@ -38,19 +38,40 @@ class ReplayMemory(object):
         return len(self.memory)
 
 
+class MyReward:
+    rewardName = "MyReward"
+    ranks = [1, 0.5, -0.5, -1]
+
+    def getReward(self, thisPlayerPosition, performanceScore, matchFinished):
+        reward = - 0.001
+        if matchFinished:
+            # finalPoints = (2 - thisPlayerPosition)/2
+            # reward = finalPoints
+            reward = self.ranks[thisPlayerPosition]
+
+        return reward
+
+
 class DQN(nn.Module):
 
-    def __init__(self, state_size=200, action_size=200, fc1_unit=400, fc2_unit=400):
+    def __init__(self, state_size=228, action_size=200, lin_size=[800, 1000, 800, 600]):
         super(DQN, self).__init__()
-        self.fc1 = nn.Linear(state_size, fc1_unit)
-        self.fc2 = nn.Linear(fc1_unit, fc2_unit)
-        self.fc3 = nn.Linear(fc2_unit, action_size)
+        self.classifier = nn.Sequential(nn.Linear(state_size, lin_size[0]),
+                                        nn.BatchNorm1d(lin_size[0]),
+                                        nn.ReLU(),
+
+                                        nn.Linear(lin_size[0], lin_size[1]),
+                                        nn.BatchNorm1d(lin_size[1]),
+                                        nn.ReLU(),
+
+                                        nn.Linear(lin_size[1], lin_size[2]),
+                                        nn.BatchNorm1d(lin_size[2]),
+                                        nn.ReLU(),
+
+                                        nn.Linear(lin_size[2], action_size))
 
     def forward(self, x):
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = self.fc3(x)
-        return x
+        return self.classifier(x)
 
 
 class DQNAgent:
@@ -61,8 +82,8 @@ class DQNAgent:
 
         self.memory = memory or ReplayMemory(BUFFER_SIZE)
 
-        self.policy = DQN()
-        self.target = DQN()
+        self.policy = DQN().to(DEVICE)
+        self.target = DQN().to(DEVICE)
 
         self.optimizer = optim.Adam(self.policy.parameters(), lr=LR)
         self.criterion = nn.SmoothL1Loss()
@@ -91,7 +112,7 @@ class DQNAgent:
             self.eps = 0.1
 
     def getAction(self, observations):
-        state = torch.from_numpy(observations[28:].astype(np.float32))
+        state = torch.from_numpy(observations[:].astype(np.float32)).to(DEVICE)
         possible_actions = observations[28:]
         itemindex = np.array(np.where(np.array(possible_actions) == 1))[0].tolist()
         itemindex = [i for i in itemindex if i not in BANNED] or itemindex
@@ -99,7 +120,8 @@ class DQNAgent:
         random.shuffle(itemindex)
 
         with torch.no_grad():
-            actions = self.policy(state)
+            self.policy.eval()
+            actions = self.policy(state.unsqueeze(0)).squeeze()
 
         actions = [actions[index] for index in itemindex]
         best_action = int(np.argmax(actions))
@@ -110,6 +132,8 @@ class DQNAgent:
         a = np.zeros(200)
         a[best_action] = 1
 
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
         return a
 
     def optimize_model(self):
@@ -172,9 +196,9 @@ class DQNAgent:
             target_param.data.copy_(tau * local_param.data + (1 - tau) * target_param.data)
 
     def actionUpdate(self, observations, nextobs, action, reward, info):
-        state = torch.from_numpy(observations[28:].astype(np.float32))
-        action = torch.tensor([np.argmax(action)])
-        reward = torch.tensor([reward])
+        state = torch.from_numpy(observations[:].astype(np.float32)).to(DEVICE)
+        action = torch.tensor([np.argmax(action)]).to(DEVICE)
+        reward = torch.tensor([reward]).to(DEVICE)
 
         if self.last_state is not None and int(action[0]) not in BANNED:
             self.memory.push(self.last_state, self.last_action, state, self.last_reward)

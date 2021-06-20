@@ -11,6 +11,7 @@ import itertools
 from q_agent import QAgent, QTable
 from dqn_agent import DQNAgent
 import numpy as np
+
 """Game parameters"""
 gameType = ChefsHatEnv.GAMETYPE["MATCHES"]
 gameStopCriteria = 10
@@ -51,8 +52,8 @@ env.startExperiment(rewardFunctions=rewards, gameType=gameType, stopCriteria=gam
 """Start Environment"""
 wins = [0] * 4
 episodes = 100
-for a in range(episodes):
-# for a in itertools.count(start=1):
+# for a in range(episodes):
+for a in itertools.count(start=1):
 
     observations = env.reset()
 
