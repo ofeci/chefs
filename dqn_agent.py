@@ -43,7 +43,7 @@ class MyReward:
     ranks = [1, 0.5, -0.5, -1]
 
     def getReward(self, thisPlayerPosition, performanceScore, matchFinished):
-        reward = - 0.001
+        reward = 0
         if matchFinished:
             # finalPoints = (2 - thisPlayerPosition)/2
             # reward = finalPoints
@@ -200,7 +200,7 @@ class DQNAgent:
         action = torch.tensor([np.argmax(action)]).to(DEVICE)
         reward = torch.tensor([reward]).to(DEVICE)
 
-        if self.last_state is not None and int(action[0]) not in BANNED:
+        if self.last_state is not None and int(self.last_action[0]) not in BANNED:
             self.memory.push(self.last_state, self.last_action, state, self.last_reward)
         self.last_state = state
         self.last_action = action
