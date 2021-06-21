@@ -42,7 +42,11 @@ class MyReward:
     rewardName = "MyReward"
     ranks = [1, 0.5, -0.5, -1]
 
-    def getReward(self, thisPlayerPosition, performanceScore, matchFinished):
+    def getReward(self, thisPlayerPosition, matchFinished,stateBefore, stateAfter):
+        # s0 = sum([1 for card in stateBefore[11:28] if card == 0])
+        # s1 = sum([1 for card in stateAfter[11:28] if card == 0])
+        # diff = abs(s0 - s1)
+        # reward = 0 if all([card == 0 for card in stateAfter[11:28]]) else -0.01
         reward = 0
         if matchFinished:
             # finalPoints = (2 - thisPlayerPosition)/2
@@ -57,15 +61,15 @@ class DQN(nn.Module):
     def __init__(self, state_size=228, action_size=200, lin_size=[800, 1000, 800, 600]):
         super(DQN, self).__init__()
         self.classifier = nn.Sequential(nn.Linear(state_size, lin_size[0]),
-                                        nn.BatchNorm1d(lin_size[0]),
+                                        # nn.BatchNorm1d(lin_size[0]),
                                         nn.ReLU(),
 
                                         nn.Linear(lin_size[0], lin_size[1]),
-                                        nn.BatchNorm1d(lin_size[1]),
+                                        # nn.BatchNorm1d(lin_size[1]),
                                         nn.ReLU(),
 
                                         nn.Linear(lin_size[1], lin_size[2]),
-                                        nn.BatchNorm1d(lin_size[2]),
+                                        # nn.BatchNorm1d(lin_size[2]),
                                         nn.ReLU(),
 
                                         nn.Linear(lin_size[2], action_size))
@@ -226,4 +230,4 @@ class DQNAgent:
         if matchFinished:
             self.update_epsilon()
 
-        return self.reward.getReward(thisPlayerPosition, performanceScore, matchFinished)
+        return self.reward.getReward(thisPlayerPosition, matchFinished, stateBefore, stateAfter)
