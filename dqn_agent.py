@@ -115,8 +115,12 @@ class DQNAgent:
         if self.eps < 0.1:
             self.eps = 0.1
 
-    def getAction(self, observations):
+    def get_state(self, observations):
         state = torch.from_numpy(observations[28:].astype(np.float32)).to(DEVICE)
+        return state
+
+    def getAction(self, observations):
+        state = self.get_state(observations)
         possible_actions = observations[28:]
         itemindex = np.array(np.where(np.array(possible_actions) == 1))[0].tolist()
         itemindex = [i for i in itemindex if i not in BANNED] or itemindex
@@ -200,7 +204,7 @@ class DQNAgent:
             target_param.data.copy_(tau * local_param.data + (1 - tau) * target_param.data)
 
     def actionUpdate(self, observations, nextobs, action, reward, info):
-        state = torch.from_numpy(observations[28:].astype(np.float32)).to(DEVICE)
+        state = self.get_state(observations)
         action = torch.tensor([np.argmax(action)]).to(DEVICE)
         reward = torch.tensor([reward]).to(DEVICE)
 
