@@ -58,9 +58,12 @@ class MyReward:
 
 class DQN(nn.Module):
 
-    def __init__(self, state_size=200, action_size=200, lin_size=[800, 1000, 800, 600]):
+    def __init__(self, state_size=28, action_size=200, lin_size=[800, 1000, 800, 600]):
         super(DQN, self).__init__()
-        self.classifier = nn.Sequential(nn.Linear(state_size, lin_size[0]),
+        self.state_size = state_size
+        self.embed_dim = 5
+        self.embed = nn.Embedding(14, self.embed_dim)
+        self.classifier = nn.Sequential(nn.Linear(self.state_size * self.embed_dim, lin_size[0]),
                                         # nn.BatchNorm1d(lin_size[0]),
                                         nn.ReLU(),
 
@@ -75,6 +78,7 @@ class DQN(nn.Module):
                                         nn.Linear(lin_size[2], action_size))
 
     def forward(self, x):
+        x = self.embed(x).view(-1, self.state_size * self.embed_dim)
         return self.classifier(x)
 
 
@@ -116,7 +120,7 @@ class DQNAgent:
             self.eps = 0.1
 
     def get_state(self, observations):
-        state = torch.from_numpy(observations[28:].astype(np.float32)).to(DEVICE)
+        state = torch.from_numpy((observations[:28] * 13).astype(np.int)).to(DEVICE)
         return state
 
     def getAction(self, observations):
