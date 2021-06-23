@@ -12,11 +12,11 @@ import torch.optim as optim
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 BUFFER_SIZE = int(2e3)  # replay buffer size
-BATCH_SIZE = 8  # minibatch size
+BATCH_SIZE = 16  # minibatch size
 GAMMA = 0.99  # discount factor
 TAU = 2e-3  # for soft update of target parameters
-LR = 5e-3  # learning rate
-UPDATE_EVERY = 3  # how often to update the network
+LR = 1e-3  # learning rate
+UPDATE_EVERY = 4  # how often to update the network
 
 BANNED = [199, 198]
 
@@ -42,12 +42,12 @@ class MyReward:
     rewardName = "MyReward"
     ranks = [1, 0.5, -0.5, -1]
 
-    def getReward(self, thisPlayerPosition, matchFinished,stateBefore, stateAfter):
+    def getReward(self, thisPlayerPosition, matchFinished, stateBefore, stateAfter):
         # s0 = sum([1 for card in stateBefore[11:28] if card == 0])
         # s1 = sum([1 for card in stateAfter[11:28] if card == 0])
         # diff = abs(s0 - s1)
         # reward = 0 if all([card == 0 for card in stateAfter[11:28]]) else -0.01
-        reward = 0
+        reward = 0.001
         if matchFinished:
             # finalPoints = (2 - thisPlayerPosition)/2
             # reward = finalPoints
@@ -58,7 +58,7 @@ class MyReward:
 
 class DQN(nn.Module):
 
-    def __init__(self, state_size=228, action_size=200, lin_size=[800, 1000, 800, 600]):
+    def __init__(self, state_size=200, action_size=200, lin_size=[800, 1000, 800, 600]):
         super(DQN, self).__init__()
         self.classifier = nn.Sequential(nn.Linear(state_size, lin_size[0]),
                                         # nn.BatchNorm1d(lin_size[0]),
@@ -116,7 +116,7 @@ class DQNAgent:
             self.eps = 0.1
 
     def getAction(self, observations):
-        state = torch.from_numpy(observations[:].astype(np.float32)).to(DEVICE)
+        state = torch.from_numpy(observations[28:].astype(np.float32)).to(DEVICE)
         possible_actions = observations[28:]
         itemindex = np.array(np.where(np.array(possible_actions) == 1))[0].tolist()
         itemindex = [i for i in itemindex if i not in BANNED] or itemindex
@@ -200,7 +200,7 @@ class DQNAgent:
             target_param.data.copy_(tau * local_param.data + (1 - tau) * target_param.data)
 
     def actionUpdate(self, observations, nextobs, action, reward, info):
-        state = torch.from_numpy(observations[:].astype(np.float32)).to(DEVICE)
+        state = torch.from_numpy(observations[28:].astype(np.float32)).to(DEVICE)
         action = torch.tensor([np.argmax(action)]).to(DEVICE)
         reward = torch.tensor([reward]).to(DEVICE)
 
