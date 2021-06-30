@@ -1,3 +1,5 @@
+import pickle
+
 from ChefsHatGym.Agents.Agent_Naive_Random import AgentNaive_Random
 
 from ChefsHatGym.Rewards import RewardOnlyWinning
@@ -23,6 +25,7 @@ gameStopCriteria = 10
 # agent1 = DQNAgent("MyAgent1")
 # memory = ReplayMemory(100000)
 agent1 = DQNAgent("1")
+
 # agent1 = DQNAgent.load("models/agent1")
 # agent1 = PathAgent("Path1")
 # agent2 = AgentNaive_Random("Random2")

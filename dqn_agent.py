@@ -58,23 +58,27 @@ class MyReward:
 
 class DQN(nn.Module):
 
-    def __init__(self, state_size=28, action_size=200, lin_size=[800, 1000, 800, 600]):
+    def __init__(self, embed_dim=20, state_size=28, action_size=200, lin_size=[800, 1000, 800, 600]):
         super(DQN, self).__init__()
         self.state_size = state_size
-        self.embed_dim = 5
+        self.embed_dim = embed_dim
         self.embed = nn.Embedding(14, self.embed_dim)
+        self.dropout = nn.Dropout(p=0.1)
         self.classifier = nn.Sequential(nn.Linear(self.state_size * self.embed_dim, lin_size[0]),
                                         # nn.BatchNorm1d(lin_size[0]),
                                         nn.ReLU(),
 
+                                        self.dropout,
                                         nn.Linear(lin_size[0], lin_size[1]),
                                         # nn.BatchNorm1d(lin_size[1]),
                                         nn.ReLU(),
 
+                                        self.dropout,
                                         nn.Linear(lin_size[1], lin_size[2]),
                                         # nn.BatchNorm1d(lin_size[2]),
                                         nn.ReLU(),
 
+                                        self.dropout,
                                         nn.Linear(lin_size[2], action_size))
 
     def forward(self, x):
@@ -115,7 +119,7 @@ class DQNAgent:
             return agent
 
     def update_epsilon(self):
-        self.eps = 0.999 * self.eps
+        self.eps = 0.997 * self.eps
         if self.eps < 0.1:
             self.eps = 0.1
 
