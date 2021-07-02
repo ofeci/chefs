@@ -79,7 +79,8 @@ for a in itertools.count(start=1):
             # print("Performance:" + str(info["performanceScore"]))
             if env.gameFinished:
                 wins[np.argmax(np.array(info["score"]))] += 1
-                print("Wins:" + str(wins))
+                status = "Wins:" + str(wins) + " Rates:" + str([int(100 * w / sum(wins)) for w in wins])
+                print(status)
             # print("-------------")
 
 # agent1.save("models/agent1")
