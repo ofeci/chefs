@@ -104,7 +104,7 @@ class DQN2Agent:
         if len(self.memory) < BATCH_SIZE:
             return
 
-        self.policy.train()
+        self.policy.continue_training()
         self.target.eval()
 
         transitions = self.memory.sample(BATCH_SIZE)

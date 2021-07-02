@@ -72,10 +72,10 @@ class DQN(nn.Module):
 
 class BrilliantAgent:
 
-    def __init__(self, name="Agent", train=True):
+    def __init__(self, name="Agent", continue_training=True):
         self.name = "Brilliant_" + name
 
-        self.train = train
+        self.continue_training = continue_training
 
         self.reward = BrilliantReward()
 
@@ -100,10 +100,10 @@ class BrilliantAgent:
             pickle.dump(self, f)
 
     @staticmethod
-    def load(file):
+    def load(file, continue_training=False):
         with open(file, 'rb') as f:
             agent = pickle.load(f)
-            agent.train = False
+            agent.continue_training = continue_training
             return agent
 
     def update_epsilon(self):
@@ -129,7 +129,7 @@ class BrilliantAgent:
         best_action = int(np.argmax(actions))
         best_action = itemindex[best_action]
 
-        if random.random() > self.eps and self.train:
+        if random.random() > self.eps and self.continue_training:
             random.shuffle(itemindex)
             best_action = itemindex[0]
 
@@ -192,7 +192,7 @@ class BrilliantAgent:
         self.last_reward = reward
 
         self.step_count += 1
-        if self.step_count % UPDATE_EVERY == 0 and self.train:
+        if self.step_count % UPDATE_EVERY == 0 and self.continue_training:
             self.optimize_model()
             self.step_count = 0
 
