@@ -1,3 +1,4 @@
+import os
 import pickle
 import random
 from collections import namedtuple, deque
@@ -12,7 +13,7 @@ DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 BUFFER_SIZE = int(2e3)  # replay buffer size
 BATCH_SIZE = 16  # minibatch size
 GAMMA = 0.99  # discount factor
-TAU = 3e-3  # for soft update of target parameters
+TAU = 2e-3  # for soft update of target parameters
 LR = 1e-3  # learning rate
 UPDATE_EVERY = 4  # how often to update the network
 
@@ -39,16 +40,16 @@ class ReplayMemory(object):
 class BrilliantReward:
     ranks = [1, 0.5, -0.5, -1]
 
-    def getReward(self, thisPlayerPosition, performanceScore, matchFinished):
+    def getReward(self, thisPlayerPosition, matchFinished):
         reward = - 0.001
         if matchFinished:
-            reward = self.ranks[thisPlayerPosition] + performanceScore
+            reward = self.ranks[thisPlayerPosition]
         return reward
 
 
 class DQN(nn.Module):
 
-    def __init__(self, embed_dim=15, state_size=28, action_size=200, lin_size=[800, 800, 600]):
+    def __init__(self, embed_dim=15, state_size=28, action_size=200, lin_size=[800, 1000, 600]):
         super(DQN, self).__init__()
         self.state_size = state_size
         self.embed_dim = embed_dim
@@ -57,13 +58,17 @@ class DQN(nn.Module):
 
         self.classifier = nn.Sequential(nn.Linear(self.state_size * self.embed_dim, lin_size[0]),
                                         nn.ReLU(),
-
                                         self.dropout,
+
                                         nn.Linear(lin_size[0], lin_size[1]),
                                         nn.ReLU(),
-
                                         self.dropout,
-                                        nn.Linear(lin_size[1], action_size))
+
+                                        nn.Linear(lin_size[1], lin_size[2]),
+                                        nn.ReLU(),
+                                        self.dropout,
+
+                                        nn.Linear(lin_size[2], action_size))
 
     def forward(self, x):
         x = self.embed(x).view(-1, self.state_size * self.embed_dim)
@@ -72,17 +77,22 @@ class DQN(nn.Module):
 
 class BrilliantAgent:
 
-    def __init__(self, name="Agent", continue_training=True):
-        self.name = "Brilliant_" + name
-
+    def __init__(self, name="Brilliant", continue_training=True, eps=1, saveModelIn=None, pretrained=None):
+        self.name = name
         self.continue_training = continue_training
-
+        self.eps = eps
         self.reward = BrilliantReward()
-
         self.memory = ReplayMemory(BUFFER_SIZE)
 
-        self.policy = DQN().to(DEVICE)
-        self.target = DQN().to(DEVICE)
+        if saveModelIn:
+            path = os.path.join(saveModelIn, pretrained)
+            with open(path, 'rb') as f:
+                policy, target = pickle.load(f)
+                self.policy = policy.to(DEVICE)
+                self.target = target.to(DEVICE)
+        else:
+            self.policy = DQN().to(DEVICE)
+            self.target = DQN().to(DEVICE)
 
         self.optimizer = optim.Adam(self.policy.parameters(), lr=LR)
         self.criterion = nn.SmoothL1Loss()
@@ -93,24 +103,31 @@ class BrilliantAgent:
 
         self.step_count = 0
 
-        self.eps = 1
+    def save(self, dir):
+        path = os.path.join(dir, self.name)
+        with open(path, 'wb') as f:
+            pickle.dump((self.policy, self.target), f)
 
-    def save(self, file):
-        with open(file, 'wb') as f:
-            pickle.dump(self, f)
+    # def load(self, file, continue_training=False, eps=0.5):
+    #     with open(file, 'rb') as f:
+    #         self.policy = pickle.load(f)
+    #     with open(file, 'rb') as f:
+    #         self.target = pickle.load(f)
+    #     self.continue_training = continue_training
+    #     self.eps = eps
 
-    @staticmethod
-    def load(file, continue_training=False):
-        with open(file, 'rb') as f:
-            agent = pickle.load(f)
-            agent.continue_training = continue_training
-            return agent
+    # @staticmethod
+    # def load(file, continue_training=False):
+    #     with open(file, 'rb') as f:
+    #         agent = pickle.load(f)
+    #         agent.continue_training = continue_training
+    #         return agent
 
     def update_epsilon(self):
         self.eps = 0.998 * self.eps if self.eps > 0.1 else 0.1
 
     def get_state(self, observations):
-        state = torch.from_numpy((observations[:28] * 13).astype(np.int)).to(DEVICE)
+        state = torch.from_numpy((observations[:28] * 13).astype(np.long)).to(DEVICE)
         return state
 
     def getAction(self, observations):
@@ -123,11 +140,11 @@ class BrilliantAgent:
 
         with torch.no_grad():
             self.policy.eval()
-            actions = self.policy(state.unsqueeze(0)).squeeze()
+            q_scores = self.policy(state.unsqueeze(0)).squeeze()
 
-        actions = [actions[index] for index in itemindex]
-        best_action = int(np.argmax(actions))
-        best_action = itemindex[best_action]
+        actions_scores = [q_scores[index] for index in itemindex]
+        best_action_index = int(np.argmax(actions_scores))
+        best_action = itemindex[best_action_index]
 
         if random.random() > self.eps and self.continue_training:
             random.shuffle(itemindex)
@@ -136,8 +153,6 @@ class BrilliantAgent:
         a = np.zeros(200)
         a[best_action] = 1
 
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
         return a
 
     def optimize_model(self):
@@ -176,8 +191,7 @@ class BrilliantAgent:
         self.soft_update(self.policy, self.target, TAU)
 
     def soft_update(self, local_model, target_model, tau):
-        for target_param, local_param in zip(target_model.parameters(),
-                                             local_model.parameters()):
+        for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
             target_param.data.copy_(tau * local_param.data + (1 - tau) * target_param.data)
 
     def actionUpdate(self, observations, nextobs, action, reward, info):
@@ -211,4 +225,4 @@ class BrilliantAgent:
         if matchFinished:
             self.update_epsilon()
 
-        return self.reward.getReward(thisPlayerPosition, performanceScore, matchFinished)
+        return self.reward.getReward(thisPlayerPosition, matchFinished)

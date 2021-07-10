@@ -3,6 +3,7 @@ from ChefsHatGym.Agents import IAgent
 from ChefsHatGym.Rewards import RewardOnlyWinning
 import random
 
+
 class MyAgent(IAgent.IAgent):
 
     def __init__(self, name="NAIVE"):

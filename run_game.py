@@ -5,13 +5,11 @@ from ChefsHatGym.Agents.Agent_Naive_Random import AgentNaive_Random
 from ChefsHatGym.Rewards import RewardOnlyWinning
 
 from ChefsHatGym.env import ChefsHatEnv
-from path_agent import PathAgent
-from memory_agent import MemoryAgent
 from my_agent import MyAgent
 import gym
 import itertools
 from q_agent import QAgent, QTable
-from dqn_agent import DQNAgent
+from brilliant_agent import BrilliantAgent
 import numpy as np
 
 """Game parameters"""
@@ -24,14 +22,17 @@ gameStopCriteria = 10
 
 # agent1 = DQNAgent("MyAgent1")
 # memory = ReplayMemory(100000)
-agent1 = DQNAgent("1")
+# agent1 = BrilliantAgent("B1", saveModelIn="models", pretrained="B1", continue_training=True, eps=0.5)
+agent1 = BrilliantAgent("B1")
 
-# agent1 = DQNAgent.load("models/agent1")
-# agent1 = PathAgent("Path1")
 # agent2 = AgentNaive_Random("Random2")
 # agent1 = MyAgent("1")
 agent2 = MyAgent("2")
+
+# agent3 = BrilliantAgent("B3", saveModelIn="models", pretrained="B1", continue_training=True, eps=0.5)
+# agent3 = BrilliantAgent("B3")
 agent3 = MyAgent("3")
+
 agent4 = MyAgent("4")
 
 
@@ -50,14 +51,15 @@ saveDataset = False
 
 
 """Setup environment"""
-env = gym.make('chefshat-v0') #starting the game Environment
+env = gym.make('chefshat-v0')
 env.startExperiment(rewardFunctions=rewards, gameType=gameType, stopCriteria=gameStopCriteria, playerNames=agentNames, logDirectory=saveDirectory, verbose=verbose, saveDataset=True, saveLog=True)
 
 """Start Environment"""
 wins = [0] * 4
-episodes = 100
-# for a in range(episodes):
-for a in itertools.count(start=1):
+
+episodes = 500
+for a in range(episodes):
+# for a in itertools.count(start=1):
 
     observations = env.reset()
 
@@ -83,4 +85,5 @@ for a in itertools.count(start=1):
                 print(status)
             # print("-------------")
 
-# agent1.save("models/agent1")
+agent1.save(dir="models")
+agent3.save(dir="models")
