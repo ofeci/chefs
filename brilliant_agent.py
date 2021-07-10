@@ -2,6 +2,7 @@ import os
 import pickle
 import random
 from collections import namedtuple, deque
+import urllib.request
 
 import numpy as np
 import torch
@@ -17,7 +18,7 @@ TAU = 2e-3  # for soft update of target parameters
 LR = 1e-3  # learning rate
 UPDATE_EVERY = 4  # how often to update the network
 
-PASS = 199
+BANNED = [199, 198]
 
 Transition = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'))
 
@@ -49,24 +50,20 @@ class BrilliantReward:
 
 class DQN(nn.Module):
 
-    def __init__(self, embed_dim=15, state_size=28, action_size=200, lin_size=[800, 1000, 600]):
+    def __init__(self, embed_dim=15, state_size=28, action_size=200, lin_size=[800, 1000, 800]):
         super(DQN, self).__init__()
         self.state_size = state_size
         self.embed_dim = embed_dim
         self.embed = nn.Embedding(14, self.embed_dim)
-        self.dropout = nn.Dropout(p=0.1)
 
         self.classifier = nn.Sequential(nn.Linear(self.state_size * self.embed_dim, lin_size[0]),
                                         nn.ReLU(),
-                                        self.dropout,
 
                                         nn.Linear(lin_size[0], lin_size[1]),
                                         nn.ReLU(),
-                                        self.dropout,
 
                                         nn.Linear(lin_size[1], lin_size[2]),
                                         nn.ReLU(),
-                                        self.dropout,
 
                                         nn.Linear(lin_size[2], action_size))
 
@@ -86,6 +83,8 @@ class BrilliantAgent:
 
         if saveModelIn:
             path = os.path.join(saveModelIn, pretrained)
+            if not os.path.exists(path):
+                self.load_github(saveModelIn, pretrained)
             with open(path, 'rb') as f:
                 policy, target = pickle.load(f)
                 self.policy = policy.to(DEVICE)
@@ -108,23 +107,20 @@ class BrilliantAgent:
         with open(path, 'wb') as f:
             pickle.dump((self.policy, self.target), f)
 
-    # def load(self, file, continue_training=False, eps=0.5):
-    #     with open(file, 'rb') as f:
-    #         self.policy = pickle.load(f)
-    #     with open(file, 'rb') as f:
-    #         self.target = pickle.load(f)
-    #     self.continue_training = continue_training
-    #     self.eps = eps
+    def load_github(self, saveModelIn, pretrained):
+        url = "https://github.com/ofeci/chefs/tree/main/models/{}".format(pretrained)
+        print("Download start!")
+        path = os.path.join(saveModelIn, pretrained)
+        filename, headers = urllib.request.urlretrieve(url, filename=path)
 
-    # @staticmethod
-    # def load(file, continue_training=False):
-    #     with open(file, 'rb') as f:
-    #         agent = pickle.load(f)
-    #         agent.continue_training = continue_training
-    #         return agent
+    def timeout(self, time):
+        pass
+
+    def raise_timeout(self, signum, frame):
+        pass
 
     def update_epsilon(self):
-        self.eps = 0.998 * self.eps if self.eps > 0.1 else 0.1
+        self.eps = 0.999 * self.eps if self.eps > 0.1 else 0.1
 
     def get_state(self, observations):
         state = torch.from_numpy((observations[:28] * 13).astype(np.long)).to(DEVICE)
@@ -134,9 +130,7 @@ class BrilliantAgent:
         state = self.get_state(observations)
         possible_actions = observations[28:]
         itemindex = np.array(np.where(np.array(possible_actions) == 1))[0].tolist()
-
-        if itemindex != [PASS]:
-            itemindex.remove(PASS)
+        itemindex = [i for i in itemindex if i not in BANNED] or itemindex
 
         with torch.no_grad():
             self.policy.eval()
@@ -146,7 +140,7 @@ class BrilliantAgent:
         best_action_index = int(np.argmax(actions_scores))
         best_action = itemindex[best_action_index]
 
-        if random.random() > self.eps and self.continue_training:
+        if random.random() < self.eps and self.continue_training:
             random.shuffle(itemindex)
             best_action = itemindex[0]
 
@@ -199,7 +193,7 @@ class BrilliantAgent:
         action = torch.tensor([np.argmax(action)]).to(DEVICE)
         reward = torch.tensor([reward]).to(DEVICE)
 
-        if self.last_state is not None and int(self.last_action[0]) != PASS:
+        if self.last_state is not None and int(self.last_action[0]) not in BANNED:
             self.memory.push(self.last_state, self.last_action, state, self.last_reward)
         self.last_state = state
         self.last_action = action
