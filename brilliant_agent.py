@@ -84,7 +84,7 @@ class DQN(nn.Module):
 
 class BrilliantAgent:
 
-    def __init__(self, name="Brilliant", continue_training=True, eps=1, saveModelIn=None, pretrained=None):
+    def __init__(self, name="Brilliant", continue_training=True, eps=1, saveModelIn=None, type=None):
         self.name = name
         self.continue_training = continue_training
         self.eps = eps
@@ -92,9 +92,9 @@ class BrilliantAgent:
         self.memory = ReplayMemory(BUFFER_SIZE)
 
         if saveModelIn:
-            path = os.path.join(saveModelIn, pretrained)
+            path = os.path.join(saveModelIn, type)
             if not os.path.exists(path):
-                self.load_github(saveModelIn, pretrained)
+                self.load_github(saveModelIn, type)
             with open(path, 'rb') as f:
                 policy, target = pickle.load(f)
                 self.policy = policy.to(DEVICE)
