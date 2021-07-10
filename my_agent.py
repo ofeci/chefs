@@ -23,6 +23,9 @@ class MyAgent(IAgent.IAgent):
         a[aIndex] = 1
         return a
 
+    def save(self, dir):
+        pass
+
     def actionUpdate(self, observations, nextobs, action, reward, info):
         pass
 

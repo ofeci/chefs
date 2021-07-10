@@ -88,4 +88,6 @@ for a in range(episodes):
             # print("-------------")
 
 agent1.save(dir="models")
+agent2.save(dir="models")
 agent3.save(dir="models")
+agent4.save(dir="models")
