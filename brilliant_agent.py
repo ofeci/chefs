@@ -54,7 +54,9 @@ class DQN(nn.Module):
         super(DQN, self).__init__()
         self.state_size = state_size
         self.embed_dim = embed_dim
-        self.embed = nn.Embedding(14, self.embed_dim)
+
+        self.embed_board = nn.Embedding(14, self.embed_dim)
+        self.embed_hand = nn.Embedding(14, self.embed_dim)
 
         self.classifier = nn.Sequential(nn.Linear(self.state_size * self.embed_dim, lin_size[0]),
                                         nn.ReLU(),
@@ -68,8 +70,16 @@ class DQN(nn.Module):
                                         nn.Linear(lin_size[2], action_size))
 
     def forward(self, x):
-        x = self.embed(x).view(-1, self.state_size * self.embed_dim)
+        x = x.view(-1, self.state_size)
+        board, hand = x[..., :11], x[..., 11:]
+        board = self.embed_board(board)
+        hand = self.embed_hand(hand)
+        x = torch.cat([board, hand], dim=-2)
+        x = x.view(-1, self.state_size * self.embed_dim)
         return self.classifier(x)
+
+    def forward_old(self, x):
+        x = self.embed(x).view(-1, self.state_size * self.embed_dim)
 
 
 class BrilliantAgent:
@@ -120,7 +130,7 @@ class BrilliantAgent:
         pass
 
     def update_epsilon(self):
-        self.eps = 0.999 * self.eps if self.eps > 0.1 else 0.1
+        self.eps = 0.998 * self.eps if self.eps > 0.1 else 0.1
 
     def get_state(self, observations):
         state = torch.from_numpy((observations[:28] * 13).astype(np.long)).to(DEVICE)

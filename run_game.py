@@ -9,6 +9,7 @@ from my_agent import MyAgent
 import gym
 import itertools
 from q_agent import QAgent, QTable
+from dqn_agent import DQNAgent
 from brilliant_agent import BrilliantAgent
 import numpy as np
 
@@ -26,8 +27,9 @@ gameStopCriteria = 10
 agent1 = BrilliantAgent("B1")
 
 # agent2 = AgentNaive_Random("Random2")
-# agent1 = MyAgent("1")
-agent2 = MyAgent("2")
+# agent2 = MyAgent("2")
+agent2 = DQNAgent("MyAgent2")
+
 
 # agent3 = BrilliantAgent("B3", saveModelIn="models", pretrained="B1", continue_training=True, eps=0.5)
 # agent3 = BrilliantAgent("B3")
