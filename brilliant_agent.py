@@ -96,9 +96,9 @@ class BrilliantAgent:
             if not os.path.exists(path):
                 self.load_github(saveModelIn, type)
             with open(path, 'rb') as f:
-                policy, target = pickle.load(f)
-                self.policy = policy.to(DEVICE)
-                self.target = target.to(DEVICE)
+                self.policy = pickle.load(f).to(DEVICE)
+            with open(path, 'rb') as f:
+                self.target = pickle.load(f).to(DEVICE)
         else:
             self.policy = DQN().to(DEVICE)
             self.target = DQN().to(DEVICE)
@@ -115,7 +115,7 @@ class BrilliantAgent:
     def save(self, dir):
         path = os.path.join(dir, self.name)
         with open(path, 'wb') as f:
-            pickle.dump((self.policy, self.target), f)
+            pickle.dump(self.policy, f)
 
     def load_github(self, saveModelIn, pretrained):
         url = "https://github.com/ofeci/chefs/tree/main/models/{}".format(pretrained)
