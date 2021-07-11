@@ -101,7 +101,7 @@ class BrilliantAgent:
                 self.policy = self.policy.to(DEVICE)
                 self.target = self.target.to(DEVICE)
             for g in self.optimizer.param_groups:
-                g['lr'] = LR * 0.2
+                g['lr'] = LR * 0.5
         else:
             self.policy = DQN().to(DEVICE)
             self.target = DQN().to(DEVICE)
@@ -134,7 +134,7 @@ class BrilliantAgent:
         pass
 
     def update_epsilon(self):
-        self.eps = 0.998 * self.eps if self.eps > 0.1 else 0.1
+        self.eps = 0.997 * self.eps if self.eps > 0.1 else 0.1
 
     def get_state(self, observations):
         state = torch.from_numpy((observations[:28] * 13).astype(np.long)).to(DEVICE)
