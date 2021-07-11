@@ -95,15 +95,18 @@ class BrilliantAgent:
             path = os.path.join(saveModelIn, type)
             if not os.path.exists(path):
                 self.load_github(saveModelIn, type)
+
             with open(path, 'rb') as f:
-                self.policy = pickle.load(f).to(DEVICE)
-            with open(path, 'rb') as f:
-                self.target = pickle.load(f).to(DEVICE)
+                self.policy, self.target, self.optimizer, self.memory = pickle.load(f)
+                self.policy = self.policy.to(DEVICE)
+                self.target = self.target.to(DEVICE)
+            for g in self.optimizer.param_groups:
+                g['lr'] = LR * 0.2
         else:
             self.policy = DQN().to(DEVICE)
             self.target = DQN().to(DEVICE)
+            self.optimizer = optim.Adam(self.policy.parameters(), lr=LR)
 
-        self.optimizer = optim.Adam(self.policy.parameters(), lr=LR)
         self.criterion = nn.SmoothL1Loss()
 
         self.last_state = None
@@ -115,7 +118,8 @@ class BrilliantAgent:
     def save(self, dir):
         path = os.path.join(dir, self.name)
         with open(path, 'wb') as f:
-            pickle.dump(self.policy, f)
+            state = (self.policy, self.target, self.optimizer, self.memory)
+            pickle.dump(state, f)
 
     def load_github(self, saveModelIn, pretrained):
         url = "https://github.com/ofeci/chefs/tree/main/models/{}".format(pretrained)

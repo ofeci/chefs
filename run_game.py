@@ -3,13 +3,10 @@ import pickle
 from ChefsHatGym.Agents.Agent_Naive_Random import AgentNaive_Random
 
 from ChefsHatGym.Rewards import RewardOnlyWinning
-
 from ChefsHatGym.env import ChefsHatEnv
 from my_agent import MyAgent
 import gym
 import itertools
-from q_agent import QAgent, QTable
-from dqn_agent import DQNAgent
 from brilliant_agent import BrilliantAgent
 import numpy as np
 
@@ -18,24 +15,23 @@ gameType = ChefsHatEnv.GAMETYPE["MATCHES"]
 gameStopCriteria = 10
 
 """Player Parameters"""
-# table = QTable()
+agent1 = MyAgent("1")
 # agent1 = AgentNaive_Random("Random1")
-
-# agent1 = DQNAgent("MyAgent1")
-# memory = ReplayMemory(100000)
-# agent1 = BrilliantAgent("B1", saveModelIn="models", pretrained="B1", continue_training=True, eps=0.5)
-agent1 = BrilliantAgent("B1")
-
-# agent2 = AgentNaive_Random("Random2")
-# agent2 = MyAgent("2")
-agent2 = DQNAgent("MyAgent2")
+# agent1 = BrilliantAgent("B1")
+# agent1 = BrilliantAgent("B1", saveModelIn="models", type="B2", continue_training=True, eps=0.8)
 
 
-# agent3 = BrilliantAgent("B3", saveModelIn="models", pretrained="B1", continue_training=True, eps=0.5)
+# agent2 = BrilliantAgent("B2", saveModelIn="models", type="B1", continue_training=True, eps=0.8)
+agent2 = MyAgent("2")
+# agent2 = DQNAgent("MyAgent2")
+
+
+# agent3 = BrilliantAgent("B3", saveModelIn="models", type="B1", continue_training=False, eps=0)
 # agent3 = BrilliantAgent("B3")
 agent3 = MyAgent("3")
 
-agent4 = MyAgent("4")
+agent4 = BrilliantAgent("B4", saveModelIn="models", type="B4", continue_training=True, eps=0.1)
+# agent4 = MyAgent("4")
 
 
 agentNames = [agent1.name, agent2.name, agent3.name, agent4.name]
@@ -87,7 +83,7 @@ for a in range(episodes):
                 print(status)
             # print("-------------")
 
-agent1.save(dir="models")
-agent2.save(dir="models")
-agent3.save(dir="models")
-agent4.save(dir="models")
+# agent1.save(dir="models")
+# agent2.save(dir="models")
+# agent3.save(dir="models")
+# agent4.save(dir="models")
