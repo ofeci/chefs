@@ -27,11 +27,11 @@ agent2 = MyAgent("2")
 
 
 # agent3 = BrilliantAgent("B3", saveModelIn="models", type="B1", continue_training=False, eps=0)
-# agent3 = BrilliantAgent("B3")
-agent3 = MyAgent("3")
+agent3 = BrilliantAgent("B3")
+# agent3 = MyAgent("3")
 
-agent4 = BrilliantAgent("B4", saveModelIn="models", type="B4", continue_training=True, eps=0.1)
-# agent4 = MyAgent("4")
+# agent4 = BrilliantAgent("B4")
+agent4 = MyAgent("4")
 
 
 agentNames = [agent1.name, agent2.name, agent3.name, agent4.name]
@@ -85,5 +85,5 @@ for a in range(episodes):
 
 # agent1.save(dir="models")
 # agent2.save(dir="models")
-# agent3.save(dir="models")
+agent3.save(dir="models")
 # agent4.save(dir="models")
