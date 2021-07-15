@@ -122,8 +122,8 @@ class BrilliantAgent:
             pickle.dump(state, f)
 
     def load_github(self, saveModelIn, pretrained):
-        url = "https://github.com/ofeci/chefs/tree/main/models/{}".format(pretrained)
-        print("Download start!")
+        url = "https://github.com/ofeci/chefs/raw/main/models/{}".format(pretrained)
+        print(f"Downloading agent {pretrained}!")
         path = os.path.join(saveModelIn, pretrained)
         filename, headers = urllib.request.urlretrieve(url, filename=path)
 
