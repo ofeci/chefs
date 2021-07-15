@@ -4,7 +4,7 @@ from ChefsHatGym.Rewards import RewardOnlyWinning
 import random
 
 
-class MyAgent(IAgent.IAgent):
+class DummyAgent(IAgent.IAgent):
 
     def __init__(self, name="NAIVE"):
         self.name = "MY_" + name

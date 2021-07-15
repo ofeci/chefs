@@ -4,7 +4,7 @@ from ChefsHatGym.Agents.Agent_Naive_Random import AgentNaive_Random
 
 from ChefsHatGym.Rewards import RewardOnlyWinning
 from ChefsHatGym.env import ChefsHatEnv
-from my_agent import MyAgent
+from dummy_agent import DummyAgent
 import gym
 import itertools
 from brilliant_agent import BrilliantAgent
@@ -15,23 +15,23 @@ gameType = ChefsHatEnv.GAMETYPE["MATCHES"]
 gameStopCriteria = 10
 
 """Player Parameters"""
-# agent1 = MyAgent("1")
+# agent1 = DummyAgent("1")
 # agent1 = AgentNaive_Random("Random1")
 agent1 = BrilliantAgent("B1")
 # agent1 = BrilliantAgent("B1", saveModelIn="models", type="B1")
 
 
 agent2 = BrilliantAgent("B2", saveModelIn="models", type="B3")
-# agent2 = MyAgent("2")
+# agent2 = DummyAgent("2")
 # agent2 = DQNAgent("MyAgent2")
 
 
 agent3 = BrilliantAgent("B3", saveModelIn="models", type="V1")
-# agent3 = MyAgent("3")
+# agent3 = DummyAgent("3")
 # agent3 = BrilliantAgent("B3")
 
 agent4 = BrilliantAgent("B4", saveModelIn="models", type="V2")
-# agent4 = MyAgent("4")
+# agent4 = DummyAgent("4")
 # agent4 = BrilliantAgent("B4")
 
 
