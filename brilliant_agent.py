@@ -134,6 +134,8 @@ class BrilliantAgent:
         pass
 
     def update_epsilon(self):
+        if self.eps < 0.1:
+            return
         self.eps = 0.997 * self.eps if self.eps > 0.1 else 0.1
 
     def get_state(self, observations):

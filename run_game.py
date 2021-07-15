@@ -15,23 +15,24 @@ gameType = ChefsHatEnv.GAMETYPE["MATCHES"]
 gameStopCriteria = 10
 
 """Player Parameters"""
-agent1 = MyAgent("1")
+# agent1 = MyAgent("1")
 # agent1 = AgentNaive_Random("Random1")
 # agent1 = BrilliantAgent("B1")
-# agent1 = BrilliantAgent("B1", saveModelIn="models", type="B2", continue_training=True, eps=0.8)
+agent1 = BrilliantAgent("B1", saveModelIn="models", type="B1", continue_training=False)
 
 
-# agent2 = BrilliantAgent("B2", saveModelIn="models", type="B1", continue_training=True, eps=0.8)
-agent2 = MyAgent("2")
+agent2 = BrilliantAgent("B2", saveModelIn="models", type="V3", continue_training=False)
+# agent2 = MyAgent("2")
 # agent2 = DQNAgent("MyAgent2")
 
 
-# agent3 = BrilliantAgent("B3", saveModelIn="models", type="B1", continue_training=False, eps=0)
-agent3 = BrilliantAgent("B3")
+agent3 = BrilliantAgent("B3", saveModelIn="models", type="V2", continue_training=False)
 # agent3 = MyAgent("3")
+# agent3 = BrilliantAgent("B3")
 
+agent4 = BrilliantAgent("B4", saveModelIn="models", type="V1", continue_training=False)
+# agent4 = MyAgent("4")
 # agent4 = BrilliantAgent("B4")
-agent4 = MyAgent("4")
 
 
 agentNames = [agent1.name, agent2.name, agent3.name, agent4.name]
@@ -55,7 +56,7 @@ env.startExperiment(rewardFunctions=rewards, gameType=gameType, stopCriteria=gam
 """Start Environment"""
 wins = [0] * 4
 
-episodes = 500
+episodes = 1
 for a in range(episodes):
 # for a in itertools.count(start=1):
 
@@ -85,5 +86,5 @@ for a in range(episodes):
 
 # agent1.save(dir="models")
 # agent2.save(dir="models")
-agent3.save(dir="models")
+# agent3.save(dir="models")
 # agent4.save(dir="models")
