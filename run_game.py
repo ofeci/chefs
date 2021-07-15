@@ -21,7 +21,7 @@ agent1 = BrilliantAgent("B1")
 # agent1 = BrilliantAgent("B1", saveModelIn="models", type="B1")
 
 
-agent2 = BrilliantAgent("B2", saveModelIn="models", type="B3")
+agent2 = BrilliantAgent("B2", saveModelIn="models", type="V5")
 # agent2 = DummyAgent("2")
 # agent2 = DQNAgent("MyAgent2")
 
