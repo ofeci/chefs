@@ -16,7 +16,7 @@ Then initiate:
 ```python
 agent = BrilliantAgent(name="<Name>", saveModelIn="<dir>", type="<type>")
 ```
-The possible `<type>` values are (our five agents):
+The possible `<type>` values are for our pretrained agents: (Make sure to run on GPU)
 * V1
 * V2
 * V3
