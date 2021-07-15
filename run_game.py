@@ -17,20 +17,20 @@ gameStopCriteria = 10
 """Player Parameters"""
 # agent1 = MyAgent("1")
 # agent1 = AgentNaive_Random("Random1")
-# agent1 = BrilliantAgent("B1")
-agent1 = BrilliantAgent("B1", saveModelIn="models", type="B1", continue_training=False)
+agent1 = BrilliantAgent("B1")
+# agent1 = BrilliantAgent("B1", saveModelIn="models", type="B1")
 
 
-agent2 = BrilliantAgent("B2", saveModelIn="models", type="V3", continue_training=False)
+agent2 = BrilliantAgent("B2", saveModelIn="models", type="B3")
 # agent2 = MyAgent("2")
 # agent2 = DQNAgent("MyAgent2")
 
 
-agent3 = BrilliantAgent("B3", saveModelIn="models", type="V2", continue_training=False)
+agent3 = BrilliantAgent("B3", saveModelIn="models", type="V1")
 # agent3 = MyAgent("3")
 # agent3 = BrilliantAgent("B3")
 
-agent4 = BrilliantAgent("B4", saveModelIn="models", type="V1", continue_training=False)
+agent4 = BrilliantAgent("B4", saveModelIn="models", type="V2")
 # agent4 = MyAgent("4")
 # agent4 = BrilliantAgent("B4")
 
