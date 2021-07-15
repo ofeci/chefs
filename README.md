@@ -7,7 +7,7 @@ The agent that we built can be found in the file dqn_agent.py
 ## How to run?
 Import the agent:
 ```python
-	from brilliant_agent import BrilliantAgent
+from brilliant_agent import BrilliantAgent
 ```
 Then initiate:
 ```python
