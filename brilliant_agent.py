@@ -100,8 +100,6 @@ class BrilliantAgent:
                 self.policy, self.target, self.optimizer, self.memory = pickle.load(f)
                 self.policy = self.policy.to(DEVICE)
                 self.target = self.target.to(DEVICE)
-            for g in self.optimizer.param_groups:
-                g['lr'] = LR * 0.5
         else:
             self.policy = DQN().to(DEVICE)
             self.target = DQN().to(DEVICE)
