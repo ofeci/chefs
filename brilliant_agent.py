@@ -8,6 +8,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from ChefsHatGym.Agents import IAgent
 
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -82,9 +83,9 @@ class DQN(nn.Module):
         x = self.embed(x).view(-1, self.state_size * self.embed_dim)
 
 
-class BrilliantAgent:
+class BrilliantAgent(IAgent.IAgent):
 
-    def __init__(self, name="Brilliant", continue_training=False, eps=1, saveModelIn=None, type=None):
+    def __init__(self, name="Brilliant", saveModelIn=None, type=None, continue_training=False, eps=1):
         self.name = name
         self.continue_training = continue_training
         self.eps = eps
@@ -124,12 +125,6 @@ class BrilliantAgent:
         print(f"Downloading agent {pretrained}!")
         path = os.path.join(saveModelIn, pretrained)
         filename, headers = urllib.request.urlretrieve(url, filename=path)
-
-    def timeout(self, time):
-        pass
-
-    def raise_timeout(self, signum, frame):
-        pass
 
     def update_epsilon(self):
         if self.eps < 0.1:
