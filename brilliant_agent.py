@@ -84,7 +84,7 @@ class DQN(nn.Module):
 
 class BrilliantAgent:
 
-    def __init__(self, name="Brilliant", continue_training=True, eps=1, saveModelIn=None, type=None):
+    def __init__(self, name="Brilliant", continue_training=False, eps=1, saveModelIn=None, type=None):
         self.name = name
         self.continue_training = continue_training
         self.eps = eps
